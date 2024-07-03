@@ -21,11 +21,71 @@ mock_completions = [
     }
 ]
 
-# Mock data for bftpd commands
-mock_bftpd_responses = {
-    "USER": {
+# Mock data for live555 commands
+mock_live555_responses = {
+    "OPTIONS": {
         "response": {
-            "USER": "[{ \"USER\": \"331 User name okay, need password.\\r\\n\" }]",
+            "OPTIONS": "[{ \"OPTIONS\": \"200 OK\\r\\nPublic: OPTIONS, DESCRIBE, SETUP, PLAY, PAUSE, TEARDOWN, ANNOUNCE, GET_PARAMETER, SET_PARAMETER, REDIRECT, RECORD\\r\\n\" }]",
+            "usage": {
+                "prompt_tokens": 5,
+                "completion_tokens": 16,
+                "total_tokens": 21
+            }
+        }
+    },
+    "DESCRIBE": {
+        "response": {
+            "DESCRIBE": "[{ \"DESCRIBE\": \"200 OK\\r\\nContent-Base: rtsp://example.com/media.mp4/\\r\\nContent-Type: application/sdp\\r\\nContent-Length: 460\\r\\n\\r\\nv=0\\r\\no=- 2890844526 2890844526 IN IP4 127.0.0.1\\r\\ns=Example Media Stream\\r\\nt=0 0\\r\\nm=video 49170 RTP/AVP 96\\r\\na=rtpmap:96 H264/90000\\r\\n\" }]",
+            "usage": {
+                "prompt_tokens": 5,
+                "completion_tokens": 30,
+                "total_tokens": 35
+            }
+        }
+    },
+    "SETUP": {
+        "response": {
+            "SETUP": "[{ \"SETUP\": \"200 OK\\r\\nTransport: RTP/AVP;unicast;client_port=8000-8001\\r\\nSession: 12345678\\r\\n\" }]",
+            "usage": {
+                "prompt_tokens": 5,
+                "completion_tokens": 16,
+                "total_tokens": 21
+            }
+        }
+    },
+    "PLAY": {
+        "response": {
+            "PLAY": "[{ \"PLAY\": \"200 OK\\r\\nRTP-Info: url=rtsp://example.com/media.mp4/streamid=0;seq=9810092;rtptime=3450012\\r\\nSession: 12345678\\r\\n\" }]",
+            "usage": {
+                "prompt_tokens": 5,
+                "completion_tokens": 21,
+                "total_tokens": 26
+            }
+        }
+    },
+    "PAUSE": {
+        "response": {
+            "PAUSE": "[{ \"PAUSE\": \"200 OK\\r\\nSession: 12345678\\r\\n\" }]",
+            "usage": {
+                "prompt_tokens": 5,
+                "completion_tokens": 10,
+                "total_tokens": 15
+            }
+        }
+    },
+    "TEARDOWN": {
+        "response": {
+            "TEARDOWN": "[{ \"TEARDOWN\": \"200 OK\\r\\nSession: 12345678\\r\\n\" }]",
+            "usage": {
+                "prompt_tokens": 5,
+                "completion_tokens": 10,
+                "total_tokens": 15
+            }
+        }
+    },
+    "ANNOUNCE": {
+        "response": {
+            "ANNOUNCE": "[{ \"ANNOUNCE\": \"200 OK\\r\\n\" }]",
             "usage": {
                 "prompt_tokens": 5,
                 "completion_tokens": 7,
@@ -33,9 +93,9 @@ mock_bftpd_responses = {
             }
         }
     },
-    "PASS": {
+    "GET_PARAMETER": {
         "response": {
-            "PASS": "[{ \"PASS\": \"230 User logged in, proceed.\\r\\n\" }]",
+            "GET_PARAMETER": "[{ \"GET_PARAMETER\": \"200 OK\\r\\n\" }]",
             "usage": {
                 "prompt_tokens": 5,
                 "completion_tokens": 7,
@@ -43,7 +103,36 @@ mock_bftpd_responses = {
             }
         }
     },
-    # Add more bftpd commands as needed
+    "SET_PARAMETER": {
+        "response": {
+            "SET_PARAMETER": "[{ \"SET_PARAMETER\": \"200 OK\\r\\n\" }]",
+            "usage": {
+                "prompt_tokens": 5,
+                "completion_tokens": 7,
+                "total_tokens": 12
+            }
+        }
+    },
+    "REDIRECT": {
+        "response": {
+            "REDIRECT": "[{ \"REDIRECT\": \"200 OK\\r\\n\" }]",
+            "usage": {
+                "prompt_tokens": 5,
+                "completion_tokens": 7,
+                "total_tokens": 12
+            }
+        }
+    },
+    "RECORD": {
+        "response": {
+            "RECORD": "[{ \"RECORD\": \"200 OK\\r\\n\" }]",
+            "usage": {
+                "prompt_tokens": 5,
+                "completion_tokens": 7,
+                "total_tokens": 12
+            }
+        }
+    }
 }
 
 # Mock data for chat/completions endpoint
@@ -105,10 +194,10 @@ def get_chat_completions():
 def post_chat_completions():
     data = request.json  # Get JSON data from request body
 
-    # Generate the response with bftpd mock responses
-    bftpd_responses = []
-    for command, response_data in mock_bftpd_responses.items():
-        bftpd_responses.append({
+    # Generate the response with live555 mock responses
+    live555_responses = []
+    for command, response_data in mock_live555_responses.items():
+        live555_responses.append({
             "message": {
                 "role": "assistant",
                 "content": response_data["response"][command],
@@ -117,7 +206,7 @@ def post_chat_completions():
             "finish_reason": "stop"
         })
    
-    mock_chat_completions[0]["choices"] = bftpd_responses
+    mock_chat_completions[0]["choices"] = live555_responses
 
     response = generate_mock_response(data, mock_chat_completions[0])
 
