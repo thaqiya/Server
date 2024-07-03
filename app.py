@@ -25,40 +25,41 @@ mock_completions = [
 mock_bftpd_responses = {
     "USER": {
         "response": {
-            "USER": "[{ \"USER\": \"331 User name okay, need password.\\r\\n\" }]",
-            "usage": {
-                "prompt_tokens": 5,
-                "completion_tokens": 7,
-                "total_tokens": 12
-            }
+            "message": {
+                "role": "assistant",
+                "content": "331 User name okay, need password.\r\n"
+            },
+            "index": 0,
+            "finish_reason": "stop"
+        },
+        "usage": {
+            "prompt_tokens": 5,
+            "completion_tokens": 7,
+            "total_tokens": 12
         }
     },
     "PASS": {
         "response": {
-            "PASS": "[{ \"PASS\": \"230 User logged in, proceed.\\r\\n\" }]",
-            "usage": {
-                "prompt_tokens": 5,
-                "completion_tokens": 7,
-                "total_tokens": 12
-            }
+            "message": {
+                "role": "assistant",
+                "content": "230 User logged in, proceed.\r\n"
+            },
+            "index": 0,
+            "finish_reason": "stop"
+        },
+        "usage": {
+            "prompt_tokens": 5,
+            "completion_tokens": 7,
+            "total_tokens": 12
         }
-    },
+    }
     # Add more bftpd commands as needed
 }
 
 # Mock data for chat/completions endpoint
 mock_chat_completions = [
     {
-        "choices": [
-            {
-                "message": {
-                    "role": "assistant",
-                    "content": "This is a mock response for /chat/completions."
-                },
-                "index": 0,
-                "finish_reason": "stop"
-            }
-        ],
+        "choices": [],
         "usage": {
             "prompt_tokens": 5,
             "completion_tokens": 7,
@@ -108,16 +109,9 @@ def post_chat_completions():
     # Generate the response with bftpd mock responses
     bftpd_responses = []
     for command, response_data in mock_bftpd_responses.items():
-        bftpd_responses.append({
-            "message": {
-                "role": "assistant",
-                "content": response_data["response"][command],
-            },
-            "index": 0,
-            "finish_reason": "stop"
-        })
+        bftpd_responses.append(response_data["response"])
     
-    mock_chat_completions[0]["choices"] = bftpd_responses
+    mock_chat_completions[0]["choices"] = [bftpd_responses]  # Wrap choices in a list
 
     response = generate_mock_response(data, mock_chat_completions[0])
 
